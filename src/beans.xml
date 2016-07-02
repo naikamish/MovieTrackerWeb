@@ -14,9 +14,15 @@
    </bean>
 
    <!-- Definition for studentJDBCTemplate bean -->
-   <bean id="movieJDBCTemplate" 
-      class="com.movietracker.MovieJDBCTemplate">
+   <bean id="movieJDBCTemplate"  class="com.movietracker.MovieJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />    
+   </bean>
+   
+   <bean id="episodeJDBCTemplate"  class="com.movietracker.EpisodeJDBCTemplate">
       <property name="dataSource"  ref="dataSource" />    
    </bean>
       
+   <bean id="showJDBCTemplate"  class="com.movietracker.ShowJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />    
+   </bean>
 </beans>

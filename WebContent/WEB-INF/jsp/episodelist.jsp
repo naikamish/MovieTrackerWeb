@@ -6,6 +6,7 @@
 
 <html>
 <head>
+<meta charset="utf-8">
 <title>Insert title here</title>
 	<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
 	<script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
@@ -17,9 +18,9 @@
 	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.css" />
 </head>
 <body>
-<h2>Movie List</h2>
+<h2>Episode List</h2>
 <div class="container-fluid">
-<form id="searchForm" class="form-horizontal" role="form" method="GET" action="/MovieTracker/searchShow">
+<form id="searchForm" class="form-horizontal" role="form" method="GET" action="/MovieTracker/searchEpisode">
 	<div class="col-sm-10">
 		<input name="searchTitle" type="text" class="form-control" placeholder="Show name...">
 	</div>
@@ -34,12 +35,13 @@
 	<table class="table table-hover table-condensed">
 	  <thead>
 	    <tr>
-	      <th class="col-md-1">View Date</th>
-	      <th class="col-md-4">Title</th>
-	      <th class="col-md-2">Director</th>
+	      <th class="col-md-1">Date</th>
+	      <th class="col-md-4">Show Title</th>
+	      <th class="col-md-1">Season</th>
+	      <th class="col-md-1">Episode</th>
+	      <th class="col-md-3">Episode Title</th>
 	      <th class="col-md-1">Year</th>
 	      <th class="col-md-1">Runtime</th>
-	      <th class="col-md-3">Genre</th>
 	    </tr>
 	  </thead>
 	  <tbody class="searchable">
@@ -47,11 +49,12 @@
 				<c:forEach var="a" items="${lists}">
 					<tr class="tableRow" />
 						<td><c:out value="${a.date}" /></td>
+						<td><c:out value="${a.show.title}" /></td>
+						<td><c:out value="${a.season}" /></td>
+						<td><c:out value="${a.episode}" /></td>
 						<td><c:out value="${a.title}" /></td>
-						<td><c:out value="${a.director}" /></td>
 						<td><c:out value="${a.release}" /></td>
 						<td><c:out value="${a.runtime}" /></td>
-						<td><c:out value="${a.genre}" /></td>
 					<tr>
 				</c:forEach>
 			</c:if>
