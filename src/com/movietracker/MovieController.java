@@ -102,25 +102,56 @@ public class MovieController {
   @RequestMapping(value = "/addEpisode", method = RequestMethod.POST)
   public String addEpisode(@ModelAttribute("WebsiteProject")Episode episode, 
   	   ModelMap model) {
+  	
   	Episode ep = episode;
-  	int runtime = getRuntime(ep.getImdbID());
-  	ep.setRuntime(runtime);
   	ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
 
 	  EpisodeJDBCTemplate episodeJDBCTemplate = (EpisodeJDBCTemplate)context.getBean("episodeJDBCTemplate");
-	      
-	  episodeJDBCTemplate.create(ep.getDate(), ep.getShow().getTmdbID(), ep.getImdbID(), ep.getTmdbID(), ep.getTitle(), ep.getRelease(), ep.getRuntime(), ep.getSeason(), ep.getEpisode());
-	  //System.out.println(ep.getDate()+ ep.getShow().getTmdbID()+ ep.getImdbID()+ ep.getTmdbID()+ ep.getTitle()+ ep.getRelease()+ ep.getRuntime()+ ep.getSeason()+ ep.getEpisode());
-  	
-	return "redirect:/episodelist";
+  	String imdbID = episodeJDBCTemplate.getImdbID(ep.getShow().getTmdbID());
+	  ep.getShow().setImdbID(imdbID);
+	  
+  	if(ep.getImdbID().equals("")){
+  		getImdbID(ep);
+  		System.out.println(ep.getImdbID());
+  	}
+  	getRuntime(ep);
+   
+	  episodeJDBCTemplate.create(ep.getDate(), ep.getShow().getImdbID(), ep.getShow().getTmdbID(), ep.getImdbID(), ep.getTmdbID(), ep.getTitle(), ep.getRelease(), ep.getRuntime(), ep.getSeason(), ep.getEpisode());
+
+	  return "redirect:/episodelist";
   }
   
-  public int getRuntime(String imdbID){
+  public void getImdbID(Episode episode){
   	
   	try{
-	  	URL siteURL = new URL("http://www.imdb.com/title/tt"+imdbID);
+  		String imdbID = episode.getShow().getImdbID();
+  		int season = episode.getSeason();
+  		String url = "http://www.imdb.com/title/tt"+imdbID+"/episodes?season="+season;
+      URL siteURL = new URL(url);
+      System.out.println(url);
+      URLConnection yc = siteURL.openConnection();
+      yc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:x.x.x) Gecko/20041107 Firefox/x.x");
+      InputStreamReader isr = new InputStreamReader(yc.getInputStream());
+      BufferedReader reader = new BufferedReader(isr);
+      String fullString = "";
+      for (String line; (line = reader.readLine()) != null;) {
+          fullString+=line;
+      }
+      String subStr = "itemprop=\"episodeNumber\" content=\""+episode.getEpisode()+"\"";
+      fullString = fullString.substring(fullString.indexOf(subStr));
+      String episodeImdbID = fullString.substring(fullString.indexOf("/title/tt")+9,fullString.indexOf("/?"));
+      episode.setImdbID(episodeImdbID);
+  	}
+  	catch(Exception e){
+  		e.printStackTrace();
+  	}
+  }
+  
+  public void getRuntime(Episode episode){
+  	
+  	try{
+  		URL siteURL = new URL("http://www.imdb.com/title/tt"+episode.getImdbID());
 	    URLConnection yc = siteURL.openConnection();
-	//set the User-Agent value (currently using the Firefox user-agent value)
 	    yc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:x.x.x) Gecko/20041107 Firefox/x.x");
 	    InputStreamReader isr = new InputStreamReader(yc.getInputStream());
 	    BufferedReader reader = new BufferedReader(isr);
@@ -130,11 +161,10 @@ public class MovieController {
 	    }
 	    fullString = fullString.substring(fullString.indexOf("<time itemprop=\"duration\" datetime=\""));
 	    String rnTm = fullString.substring(fullString.indexOf("itemprop=\"duration\" datetime=\"")+32, fullString.indexOf("M"));
-	    return Integer.parseInt(rnTm);
+	    episode.setRuntime(Integer.parseInt(rnTm));
   	}
   	catch(Exception e){
   		e.printStackTrace();
   	}
-  	return 0;
   }
 }

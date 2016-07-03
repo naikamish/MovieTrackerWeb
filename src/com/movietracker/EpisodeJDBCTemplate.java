@@ -22,14 +22,21 @@ public class EpisodeJDBCTemplate implements EpisodeDAO{
     return episodes;
   }
   
-  public void create(Date date, String showTmdbID, String episodeImdbID, String tmdbID, String title, int release, int runtime, int season, int episode) {
+  public String getImdbID(String showTmdbID){
   	String SQL = "select imdbid from showlist where tmdbid=?";
   	String imdbID = jdbcTemplateObject.queryForObject(SQL, new Object[]{showTmdbID}, String.class);
-  	SQL = "insert into episodelist(imdbid, tmdbid, title, runtime, releaseDate, season, episode) values (?, ?, ?, ?, ?, ?, ?)";
+  	return imdbID;
+  }
+  
+  public void create(Date date, String showImdbID, String showTmdbID, String episodeImdbID, String tmdbID, String title, int release, int runtime, int season, int episode) {
+  	//String SQL = "select imdbid from showlist where tmdbid=?";
+  	//String imdbID = jdbcTemplateObject.queryForObject(SQL, new Object[]{showTmdbID}, String.class);
+  	
+  	String SQL = "insert into episodelist(imdbid, tmdbid, title, runtime, releaseDate, season, episode) values (?, ?, ?, ?, ?, ?, ?)";
     jdbcTemplateObject.update( SQL, episodeImdbID, tmdbID, title, Integer.toString(runtime), Integer.toString(release), season, episode);
     
     SQL = "insert into episodewatched(viewdate, showimdbid, episodeimdbid) values (?, ?, ?)";
-    jdbcTemplateObject.update( SQL, date, imdbID, episodeImdbID);
+    jdbcTemplateObject.update( SQL, date, showImdbID, episodeImdbID);
     return;
   }
 }

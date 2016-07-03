@@ -37,15 +37,22 @@ $(document).ready(function(){
 		var episode = $("#episode").val();
 		var tmdbID = $("#showTmdbID").val();
 		var request2 = new XMLHttpRequest();
-
-		request2.open('GET', 'https://api.themoviedb.org/3/tv/'+tmdbID+'/season/'+season+'/episode/'+episode+'?api_key=78d8e4223cc69693424d6ca812c1bfcb&append_to_response=external_ids');
-
+		var url = 'https://api.themoviedb.org/3/tv/'+tmdbID+'/season/'+season+'/episode/'+episode+'?api_key=78d8e4223cc69693424d6ca812c1bfcb&append_to_response=external_ids';
+		request2.open('GET', url);
+		console.log(url);
 		request2.setRequestHeader('Accept', 'application/json');
 
 		request2.onreadystatechange = function () {
 		  if (this.readyState === 4 && this.status === 200) {
 			  var respArr = JSON.parse(this.responseText);
-			  var episodeImdbID = respArr.external_ids.imdb_id.substring(2);
+			  var episodeImdbID = respArr.external_ids.imdb_id;
+			  if(!episodeImdbID)
+				  episodeImdbID="";
+			  else{
+				  episodeImdbID = episodeImdbID.substring(2);
+			  }
+			  console.log(episodeImdbID);
+			  //.substring(2);
 			  $("#imdbID").val(episodeImdbID);
 			  $("#tmdbID").val(respArr.id);
 			  $("#title").val(respArr.name);
