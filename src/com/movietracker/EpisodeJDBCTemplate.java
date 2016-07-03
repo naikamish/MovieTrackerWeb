@@ -1,5 +1,6 @@
 package com.movietracker;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -16,8 +17,19 @@ public class EpisodeJDBCTemplate implements EpisodeDAO{
   }
   
   public List<Episode> listEpisodes() {
-    String SQL = "select e.viewdate, s.title, e.episodeseason, e.episodenumber, e.episodetitle, e.releasedate, e.runtime from episodewatched e inner join tvshow s on e.showimdbid=s.showimdbid order by viewdate desc, episodewatchedid desc;";
+    String SQL = "select v.viewdate, s.title as showtitle, e.season, e.episode, e.title as episodetitle, e.releasedate, e.runtime from episodewatched v inner join showlist s on v.showimdbid=s.imdbid inner join episodelist e on v.episodeimdbid=e.imdbid order by viewdate desc, episodewatchedid desc;";
     List <Episode> episodes = jdbcTemplateObject.query(SQL, new EpisodeMapper());
     return episodes;
+  }
+  
+  public void create(Date date, String showTmdbID, String episodeImdbID, String tmdbID, String title, int release, int runtime, int season, int episode) {
+  	String SQL = "select imdbid from showlist where tmdbid=?";
+  	String imdbID = jdbcTemplateObject.queryForObject(SQL, new Object[]{showTmdbID}, String.class);
+  	SQL = "insert into episodelist(imdbid, tmdbid, title, runtime, releaseDate, season, episode) values (?, ?, ?, ?, ?, ?, ?)";
+    jdbcTemplateObject.update( SQL, episodeImdbID, tmdbID, title, Integer.toString(runtime), Integer.toString(release), season, episode);
+    
+    SQL = "insert into episodewatched(viewdate, showimdbid, episodeimdbid) values (?, ?, ?)";
+    jdbcTemplateObject.update( SQL, date, imdbID, episodeImdbID);
+    return;
   }
 }

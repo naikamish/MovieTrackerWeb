@@ -10,6 +10,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,6 +66,7 @@ public class MovieController {
 		EpisodeJDBCTemplate episodeJDBCTemplate = (EpisodeJDBCTemplate)context.getBean("episodeJDBCTemplate");
 		List<Episode> list = episodeJDBCTemplate.listEpisodes();
 		ModelAndView model = new ModelAndView("episodelist");
+		model.addObject("command", new Episode());
 		model.addObject("lists",list);
 		return model;
   }
@@ -76,7 +82,6 @@ public class MovieController {
   @RequestMapping(value = "/addShow", method = RequestMethod.POST)
   public String addShow(@ModelAttribute("WebsiteProject")Show show, 
   	   ModelMap model) {
-  	System.out.println(show.getImdbID()+show.getTmdbID()+show.getRuntime()+show.getTitle());
   	ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
 
 	  ShowJDBCTemplate showJDBCTemplate = (ShowJDBCTemplate)context.getBean("showJDBCTemplate");
@@ -84,5 +89,52 @@ public class MovieController {
 	  showJDBCTemplate.create(show.getImdbID(), show.getTmdbID(), show.getTitle(), show.getRuntime());
 
 	return "redirect:/episodelist";
+  }
+  
+  @RequestMapping(value = "/showlist", method = RequestMethod.GET)
+  public @ResponseBody List<Show> showList() {
+		ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+		ShowJDBCTemplate showJDBCTemplate = (ShowJDBCTemplate)context.getBean("showJDBCTemplate");
+		List<Show> list = showJDBCTemplate.listShows();
+		return list;
+  }
+  
+  @RequestMapping(value = "/addEpisode", method = RequestMethod.POST)
+  public String addEpisode(@ModelAttribute("WebsiteProject")Episode episode, 
+  	   ModelMap model) {
+  	Episode ep = episode;
+  	int runtime = getRuntime(ep.getImdbID());
+  	ep.setRuntime(runtime);
+  	ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+
+	  EpisodeJDBCTemplate episodeJDBCTemplate = (EpisodeJDBCTemplate)context.getBean("episodeJDBCTemplate");
+	      
+	  episodeJDBCTemplate.create(ep.getDate(), ep.getShow().getTmdbID(), ep.getImdbID(), ep.getTmdbID(), ep.getTitle(), ep.getRelease(), ep.getRuntime(), ep.getSeason(), ep.getEpisode());
+	  //System.out.println(ep.getDate()+ ep.getShow().getTmdbID()+ ep.getImdbID()+ ep.getTmdbID()+ ep.getTitle()+ ep.getRelease()+ ep.getRuntime()+ ep.getSeason()+ ep.getEpisode());
+  	
+	return "redirect:/episodelist";
+  }
+  
+  public int getRuntime(String imdbID){
+  	
+  	try{
+	  	URL siteURL = new URL("http://www.imdb.com/title/tt"+imdbID);
+	    URLConnection yc = siteURL.openConnection();
+	//set the User-Agent value (currently using the Firefox user-agent value)
+	    yc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:x.x.x) Gecko/20041107 Firefox/x.x");
+	    InputStreamReader isr = new InputStreamReader(yc.getInputStream());
+	    BufferedReader reader = new BufferedReader(isr);
+	    String fullString = "";
+	    for (String line; (line = reader.readLine()) != null;) {
+	        fullString+=line;
+	    }
+	    fullString = fullString.substring(fullString.indexOf("<time itemprop=\"duration\" datetime=\""));
+	    String rnTm = fullString.substring(fullString.indexOf("itemprop=\"duration\" datetime=\"")+32, fullString.indexOf("M"));
+	    return Integer.parseInt(rnTm);
+  	}
+  	catch(Exception e){
+  		e.printStackTrace();
+  	}
+  	return 0;
   }
 }

@@ -10,7 +10,7 @@ public class ShowMapper implements RowMapper<Show>{
     Show show = new Show();
     
     show.setTitle(rs.getString("title"));
-    show.setImdbID(rs.getString("imdbID"));
+    show.setTmdbID(rs.getString("tmdbid"));
     
     return show;
   }

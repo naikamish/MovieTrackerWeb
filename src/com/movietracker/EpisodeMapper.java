@@ -10,15 +10,15 @@ public class EpisodeMapper implements RowMapper<Episode>{
     Episode episode = new Episode();
     Show show = new Show();
     
-    show.setTitle(rs.getString("title"));
+    show.setTitle(rs.getString("showtitle"));
     
     episode.setShow(show);
     episode.setTitle(rs.getString("episodetitle"));
     episode.setRelease(rs.getInt("releasedate"));
     episode.setRuntime(rs.getInt("runtime"));
     episode.setDate(rs.getDate("viewdate"));
-    episode.setSeason(rs.getInt("episodeseason"));
-    episode.setEpisode(rs.getInt("episodenumber"));
+    episode.setSeason(rs.getInt("season"));
+    episode.setEpisode(rs.getInt("episode"));
     return episode;
   }
 }

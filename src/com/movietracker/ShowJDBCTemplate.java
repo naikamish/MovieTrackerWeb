@@ -17,7 +17,7 @@ public class ShowJDBCTemplate implements ShowDAO{
   }
   
   public List<Show> listShows() {
-    String SQL = "select title, imdbid from showlist";
+    String SQL = "select title, tmdbid from showlist";
     List <Show> shows = jdbcTemplateObject.query(SQL, new ShowMapper());
     return shows;
   }
