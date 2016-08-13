@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.googlecode.charts4j.Color;
+import com.googlecode.charts4j.GCharts;
+import com.googlecode.charts4j.PieChart;
+import com.googlecode.charts4j.Slice;
+
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 
@@ -166,5 +171,19 @@ public class MovieController {
   	catch(Exception e){
   		e.printStackTrace();
   	}
+  }
+  @RequestMapping(value = "/statistics", method = RequestMethod.GET)
+  public ModelAndView statistics() {
+		Slice s1 = Slice.newSlice(15, Color.newColor("CACACA"), "Mac", "Mac");
+		Slice s2 = Slice.newSlice(50, Color.newColor("DF7417"), "Windows", "Windows");
+		Slice s3 = Slice.newSlice(25, Color.newColor("951800"), "Linux", "Linux");
+		Slice s4 = Slice.newSlice(10, Color.newColor("01A1DB"), "Others", "Others");
+		PieChart pieChart = GCharts.newPieChart(s1, s2, s3, s4);
+		pieChart.setTitle("Google Pie Chart", Color.BLACK, 15);
+		pieChart.setSize(720, 360);
+		pieChart.setThreeD(true);
+		ModelAndView model = new ModelAndView("statistics");
+		model.addObject("pieUrl", pieChart.toURLString());
+		return model;
   }
 }

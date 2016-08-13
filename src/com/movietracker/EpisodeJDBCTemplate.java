@@ -2,10 +2,12 @@ package com.movietracker;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
 public class EpisodeJDBCTemplate implements EpisodeDAO{
   private DataSource dataSource;
@@ -17,8 +19,11 @@ public class EpisodeJDBCTemplate implements EpisodeDAO{
   }
   
   public List<Episode> listEpisodes() {
-    String SQL = "select v.viewdate, s.title as showtitle, e.season, e.episode, e.title as episodetitle, e.releasedate, e.runtime from episodewatched v inner join showlist s on v.showimdbid=s.imdbid inner join episodelist e on v.episodeimdbid=e.imdbid order by viewdate desc, episodewatchedid desc;";
-    List <Episode> episodes = jdbcTemplateObject.query(SQL, new EpisodeMapper());
+  	SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTemplateObject)
+  			.withProcedureName("usp_getShowList")
+  			.returningResultSet("episodes", new EpisodeMapper());
+    Map<String, Object> out = jdbcCall.execute();
+    List<Episode> episodes = (List<Episode>)out.get("episodes"); 
     return episodes;
   }
   

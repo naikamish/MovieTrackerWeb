@@ -19,7 +19,7 @@
 <body>
 <h2>Movie List</h2>
 <div class="container-fluid">
-<form id="searchForm" class="form-horizontal" role="form" method="GET" action="/MovieTracker/searchShow">
+<form id="searchForm" class="form-horizontal" role="form" method="GET" action="/MovieTracker/search">
 	<div class="col-sm-10">
 		<input name="searchTitle" type="text" class="form-control" placeholder="Show name...">
 	</div>

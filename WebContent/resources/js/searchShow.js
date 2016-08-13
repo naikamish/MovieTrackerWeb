@@ -45,7 +45,7 @@ function setValues(myArr){
     var tmdbID = myArr.id;
     var imdbID = myArr.external_ids.imdb_id.substring(2);
     var title = myArr.original_name;
-    var runtime = myArr.episode_run_time;
+    var runtime = 0;
     $('#addShow #runtime').val( runtime );
 	$('#addShow #tmdbID').val( tmdbID );
 	$('#addShow #imdbID').val( imdbID );
